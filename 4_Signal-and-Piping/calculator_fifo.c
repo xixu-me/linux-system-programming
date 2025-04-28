@@ -12,25 +12,25 @@ int main() {
 	int num;
 	int sum = 0;
 
-	printf("Calculator started. Waiting for collector...\n");
+	printf("Calculator 已启动，等待 Collector...\n");
 
-	// Open FIFO for reading
+	// 打开 FIFO 以读取
 	fd = open(FIFO_PATH, O_RDONLY);
 	if (fd == -1) {
-		perror("Failed to open FIFO");
+		perror("打开 FIFO 失败");
 		exit(EXIT_FAILURE);
 	}
 
-	printf("Connected! Ready to receive integers.\n");
+	printf("已连接！准备接收整数。\n");
 
-	// Read integers from the FIFO and calculate the sum
+	// 从 FIFO 读取整数并计算总和
 	while (read(fd, &num, sizeof(int)) > 0) {
 		sum += num;
-		printf("Received: %d, Current Sum: %d\n", num, sum);
+		printf("接收到：%d，当前总和：%d\n", num, sum);
 	}
 
 	close(fd);
-	printf("Calculator exiting.\n");
+	printf("Calculator 退出。\n");
 
 	return 0;
 }

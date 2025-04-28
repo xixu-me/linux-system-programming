@@ -13,33 +13,33 @@ int main() {
 	int fd;
 	int num;
 
-	// Create the FIFO if it doesn't exist
+	// 创建 FIFO 如果不存在
 	if (mkfifo(FIFO_PATH, 0666) == -1 && errno != EEXIST) {
-		perror("mkfifo error");
+		perror("创建 FIFO 失败");
 		exit(EXIT_FAILURE);
 	}
 
-	printf("Collector started. Connecting to calculator...\n");
+	printf("Collector 已启动，正在连接 Calculator...\n");
 
-	// Open FIFO for writing
+	// 打开 FIFO 以写入
 	fd = open(FIFO_PATH, O_WRONLY);
 	if (fd == -1) {
-		perror("Failed to open FIFO");
+		perror("打开 FIFO 失败");
 		exit(EXIT_FAILURE);
 	}
 
-	printf("Connected! Enter integers (Ctrl+D to exit):\n");
+	printf("已连接！输入整数（Ctrl+D 退出）：\n");
 
 	while (scanf("%d", &num) == 1) {
 		if (write(fd, &num, sizeof(int)) == -1) {
-			perror("Write error");
+			perror("写入错误");
 			break;
 		}
-		printf("Sent: %d\n", num);
+		printf("已发送：%d\n", num);
 	}
 
 	close(fd);
-	printf("Collector exiting.\n");
+	printf("Collector 退出。\n");
 
 	return 0;
 }

@@ -10,56 +10,56 @@ int main() {
 	pid_t pid;
 	int num, sum = 0;
 
-	// Create pipe
+	// 创建管道
 	if (pipe(pipe_fd) == -1) {
-		perror("Pipe creation failed");
+		perror("管道创建失败");
 		exit(EXIT_FAILURE);
 	}
 
-	// Create child process
+	// 创建子进程
 	pid = fork();
 
 	if (pid < 0) {
-		// Fork failed
-		perror("Fork failed");
+		// fork失败
+		perror("fork 失败");
 		exit(EXIT_FAILURE);
 	}
 	else if (pid == 0) {
-		// Child process - calculator
-		close(pipe_fd[1]); // Close write end of pipe
+		// 子进程 - Calculator
+		close(pipe_fd[1]); // 关闭管道写端
 
-		printf("[Calculator] Started. Waiting for integers...\n");
+		printf("[Calculator] 启动。等待整数...\n");
 
 		while (read(pipe_fd[0], &num, sizeof(int)) > 0) {
 			sum += num;
-			printf("[Calculator] Received: %d, Current Sum: %d\n", num, sum);
+			printf("[Calculator] 收到：%d，当前总和：%d\n", num, sum);
 		}
 
 		close(pipe_fd[0]);
-		printf("[Calculator] Exiting.\n");
+		printf("[Calculator] 退出。\n");
 		exit(EXIT_SUCCESS);
 	}
 	else {
-		// Parent process - collector
-		close(pipe_fd[0]); // Close read end of pipe
+		// 父进程 - Collector
+		close(pipe_fd[0]); // 关闭管道读端
 
-		printf("[Collector] Started. Enter integers (Ctrl+D to exit):\n");
+		printf("[Collector] 启动。输入整数（Ctrl+D 退出）：\n");
 
 		while (scanf("%d", &num) == 1) {
 			if (write(pipe_fd[1], &num, sizeof(int)) == -1) {
-				perror("Write error");
+				perror("写入错误");
 				break;
 			}
-			printf("[Collector] Sent: %d\n", num);
+			printf("[Collector] 已发送：%d\n", num);
 		}
 
-		close(pipe_fd[1]); // Close write end to signal EOF to child
-		printf("[Collector] Waiting for calculator to finish...\n");
+		close(pipe_fd[1]); // 关闭管道写端以向子进程发送EOF信号
+		printf("[Collector] 等待 Calculator 完成...\n");
 
-		// Wait for child to finish
+		// 等待子进程完成
 		wait(NULL);
 
-		printf("[Collector] Exiting.\n");
+		printf("[Collector] 退出。\n");
 	}
 
 	return 0;
